@@ -1,0 +1,14 @@
+@(userId: String)
+
+@layout(title = "Dashboard") {
+
+	<h1>Dashboard</h1>
+	<p>
+		Welcome!<br />
+		Your user_id is @userId.
+	</p>
+	<form action="@routes.DashboardController.doLogout()" method="post">
+		<input class="btn btn-primary" type="submit" value="Logout" />
+	</form>
+
+}

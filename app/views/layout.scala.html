@@ -1,0 +1,21 @@
+@(title:String)(content: => Html)
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel='stylesheet'
+	href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
+<title>@title</title>
+</head>
+<body>
+		<nav class="navbar navbar-default">
+			<div class="navbar-header">
+				<a class="navbar-brand">OpenID Connect Client Demo</a>
+			</div>
+		</nav>
+		<div class="container">
+			@content
+		</div>
+</body>
+</html>
