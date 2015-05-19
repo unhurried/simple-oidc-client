@@ -6,11 +6,9 @@ import play.mvc.Http.Context;
 
 public class UserAuthenticator extends Security.Authenticator {
 
-	private static final String SESSION_KEY_USER_ID = "userId";
-
 	@Override
     public String getUsername(Context ctx) {
-        return ctx.session().get(SESSION_KEY_USER_ID);
+        return SessionManager.getLoginUser();
     }
 
 	@Override
