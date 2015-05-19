@@ -1,0 +1,9 @@
+@layout(title = "Dashboard") {
+
+	<h1>Login</h1>
+	<p>Please press the button below.</p>
+	<form action="@routes.LoginController.doLogin()" method="post">
+		<input class="btn btn-primary" type="submit" value="Login" />
+	</form>
+
+}
