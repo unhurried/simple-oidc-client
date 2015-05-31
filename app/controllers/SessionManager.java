@@ -11,9 +11,10 @@ import com.nimbusds.oauth2.sdk.id.State;
 
 public class SessionManager {
 
-	private static final String KEY_ID_TOKEN = "id_token";
-	private static final String KEY_USER_ID = "userId";
-	private static final String KEY_STATE = "state";
+	// Cookie key
+	private static final String ID_TOKEN = "id_token";
+	private static final String USER_ID = "userId";
+	private static final String STATE = "state";
 
     private static Session session() {
         return Http.Context.current().session();
@@ -33,7 +34,7 @@ public class SessionManager {
 	 */
 	public static void login(String userId) {
 
-		session(KEY_USER_ID, userId);
+		session(USER_ID, userId);
 	}
 
 	/**
@@ -41,7 +42,7 @@ public class SessionManager {
 	 */
 	public static void logout() {
 
-		session().remove(KEY_USER_ID);
+		session().remove(USER_ID);
 	}
 
 	/**
@@ -50,7 +51,7 @@ public class SessionManager {
 	 */
 	public static String getLoginUser() {
 
-		String userIdAsString = session(KEY_USER_ID);
+		String userIdAsString = session(USER_ID);
 		if (userIdAsString == null || userIdAsString.equals("")) {
 			return null;
 		}
@@ -63,7 +64,7 @@ public class SessionManager {
 	 */
 	public static State getState() {
 
-		String stateAsString = session(KEY_STATE);
+		String stateAsString = session(STATE);
 		if (stateAsString == null || stateAsString.equals("")) {
 			return null;
 		}
@@ -76,7 +77,7 @@ public class SessionManager {
 	 */
 	public static void setState(State state) {
 
-		session(KEY_STATE, state.getValue());
+		session(STATE, state.getValue());
 	}
 
 	/**
@@ -85,7 +86,7 @@ public class SessionManager {
 	 */
 	public static JWT getIdToken() {
 
-		String idTokenAsString = session(KEY_ID_TOKEN);
+		String idTokenAsString = session(ID_TOKEN);
 		if (idTokenAsString == null || idTokenAsString.equals("")) {
 			return null;
 		}
@@ -103,6 +104,6 @@ public class SessionManager {
 	 */
 	public static void setIdToken(JWT idToken) {
 
-		session(KEY_ID_TOKEN, idToken.serialize());
+		session(ID_TOKEN, idToken.serialize());
 	}
 }

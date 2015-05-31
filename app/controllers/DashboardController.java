@@ -1,7 +1,6 @@
 package controllers;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 import com.nimbusds.jwt.JWT;
 import com.nimbusds.oauth2.sdk.SerializeException;
@@ -12,17 +11,6 @@ import play.mvc.*;
 import views.html.*;
 
 public class DashboardController extends Controller {
-
-	private static final URI logoutEndpoint;
-	private static final URI postLogoutRedirectUri;
-	static {
-		try {
-			logoutEndpoint = new URI("http://localhost:9000/dummyLogoutEndpoint");
-			postLogoutRedirectUri = new URI("http://localhost:9000/logoutCallback");
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	@Security.Authenticated(UserAuthenticator.class)
 	public static Result getPage() {
@@ -42,7 +30,12 @@ public class DashboardController extends Controller {
 
 		State state = new State();
 		SessionManager.setState(state);
-		LogoutRequest logoutRequest = new LogoutRequest(logoutEndpoint, idToken, postLogoutRedirectUri, state);
+		LogoutRequest logoutRequest = new LogoutRequest(
+			ConfigManager.getLogoutEndpoint(),
+			idToken,
+			ConfigManager.getPostLogoutRedirectUri(),
+			state
+		);
 		try {
 			return redirect(logoutRequest.toURI().toString());
 		} catch (SerializeException e) {

@@ -17,25 +17,6 @@ import views.html.*;
 
 public class LoginController extends Controller {
 
-	// Parameters for OpenID Connect
-	private static final ClientID clientId = new ClientID("dummy");
-	private static final Secret clientSecret = new Secret("dummy");
-	private static final Scope scope = new Scope("openid");
-	private static final Issuer issuer = new Issuer("dummy");
-	private static final Audience audience = new Audience(clientId.toString());
-	private static final URI authzEndpoint;
-	private static final URI tokenEndpoint;
-	private static final URI redirectUri;
-	static {
-		try {
-			authzEndpoint = new URI("http://example.com/authz");
-			tokenEndpoint = new URI("http://example.com/token");
-			redirectUri = new URI("http://localhost:9000/loginCallback");
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public static Result getPage() {
 		return ok(login.render());
 	}
@@ -50,8 +31,13 @@ public class LoginController extends Controller {
 		URI requestUri;
 		try {
 			ResponseType responseType = new ResponseType(ResponseType.Value.CODE);
-			requestUri = new AuthenticationRequest.Builder(responseType, scope, clientId, redirectUri)
-				.endpointURI(authzEndpoint)
+			requestUri = new AuthenticationRequest.Builder(
+				responseType,
+				ConfigManager.getScope(),
+				ConfigManager.getClient(),
+				ConfigManager.getRedirectUri()
+			)
+				.endpointURI(ConfigManager.getAuthzEndpoint())
 				.state(state)
 				.build()
 				.toURI();
@@ -96,9 +82,9 @@ public class LoginController extends Controller {
 		/*
 		 * Exchange authorization code for id token.
 		 */
-		AuthorizationGrant authzGrant = new AuthorizationCodeGrant(authzCode, redirectUri);
-		ClientAuthentication clientAuthn = new ClientSecretBasic(clientId, clientSecret);
-		TokenRequest tokenRequest = new TokenRequest(tokenEndpoint, clientAuthn, authzGrant);
+		AuthorizationGrant authzGrant = new AuthorizationCodeGrant(authzCode, ConfigManager.getRedirectUri());
+		ClientAuthentication clientAuthn = new ClientSecretBasic(ConfigManager.getClient(), ConfigManager.getSecret());
+		TokenRequest tokenRequest = new TokenRequest(ConfigManager.getTokenEndpoint(), clientAuthn, authzGrant);
 		TokenResponse tokenResponse;
 		try {
 			tokenResponse = OIDCTokenResponseParser.parse(tokenRequest.toHTTPRequest().send());
@@ -124,10 +110,11 @@ public class LoginController extends Controller {
 			throw new RuntimeException(e);
 		}
 		// iss
-		if (!idTokenClaimSet.getIssuer().equals(issuer)) {
+		if (!idTokenClaimSet.getIssuer().equals(ConfigManager.getIssuer())) {
 			return ok(error.render("issuer is invalid. iss=" + String.valueOf(idTokenClaimSet.getIssuer())));
 		}
 		// aud
+		Audience audience = new Audience(ConfigManager.getClient().getValue());
 		if (!idTokenClaimSet.getAudience().contains(audience)) {
 			return ok(error.render("Audience is invalid. aud=" + String.valueOf(idTokenClaimSet.getAudience())));
 		}
